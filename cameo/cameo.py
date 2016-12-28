@@ -1,4 +1,6 @@
 import cv2
+import filters
+import numpy
 from managers import WindowManager, CaptureManager
 
 class Cameo(object):
@@ -8,7 +10,7 @@ class Cameo(object):
                                             self.onKeypress)
         self._captureManager = CaptureManager(
             cv2.VideoCapture(0), self._windowManager, True)
-    
+
     def run(self):
         """Run the main loop."""
         self._windowManager.createWindow()
@@ -17,9 +19,9 @@ class Cameo(object):
             frame = self._captureManager.frame
             
             if frame is not None:
-                # TODO: Filter the frame (Chapter 3).
-                pass
-            
+                self._captureManager.frame = filters.ToGray(frame)
+
+
             self._captureManager.exitFrame()
             self._windowManager.processEvents()
     

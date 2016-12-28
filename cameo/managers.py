@@ -33,7 +33,7 @@ class CaptureManager(object):
         if self._channel != value:
             self._channel = value
             self._frame = None
-    
+
     @property
     def frame(self):
         if self._enteredFrame and self._frame is None:
@@ -42,7 +42,11 @@ class CaptureManager(object):
             # _, self._frame = self._capture.retrieve(channel = self.channel)
             _, self._frame = self._capture.retrieve()
         return self._frame
-    
+
+    @frame.setter
+    def frame(self, value):
+        self._frame = value
+
     @property
     def isWritingImage(self):
         return self._imageFilename is not None
