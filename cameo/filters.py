@@ -254,7 +254,66 @@ class EmbossFilter(VConvolutionFilter):
                               [ 0,  1, 2]])
         VConvolutionFilter.__init__(self, kernel)
 
-def ToGray(src):
+def CannyDetect(src):
     grayImg = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
     return cv2.Canny(grayImg, 100, 200)
 
+def FastDetect(src):
+    fast = cv2.FastFeatureDetector()
+    grayImg = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+    kp = fast.detect(grayImg, None)
+    return cv2.drawKeypoints(grayImg, kp, color=(255, 0, 0))
+
+def GaussianBlurhandle(src):
+    grayImg = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+    return cv2.GaussianBlur(grayImg, (9, 9), 0)
+
+
+
+def FaceDetect(src):
+    face_cascade = cv2.CascadeClassifier('./cascades/haarcascade_frontalface_default.xml')
+    eye_cascade = cv2.CascadeClassifier('./cascades/haarcascade_eye.xml')
+    img = src
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+    for (x, y, w, h) in faces:
+        cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+    return img
+
+def CornerHarrisHanle(src):
+    img = src
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray = numpy.float32(gray)
+    dst = cv2.cornerHarris(gray, 9, 29, 0.04)
+    img[dst>0.01 * dst.max()] = [0, 0, 255]
+    return img
+
+def findHighlightPoint(src):
+    img = src
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    w = gray.shape[1]
+    h = gray.shape[0]
+    for xi in xrange(0, w):
+        for xj in xrange(0, h):
+            # set the pixel value decrease to 20%
+            if gray[xj, xi] > 200:
+                img[xj, xi] = [0, 0, 255]
+    return img
+
+def combineHighlightandCornerHarrisHanle(src):
+    img = src
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray = numpy.float32(gray)
+    dst = cv2.cornerHarris(gray, 9, 29, 0.04)
+
+    # img[dst > 0.01 * dst.max()] = [0, 0, 255]
+    w = gray.shape[1]
+    h = gray.shape[0]
+    nimolevel = 0.01 * dst.max()
+    for xi in xrange(0, w):
+        for xj in xrange(0, h):
+            # set the pixel value decrease to 20%
+            if gray[xj, xi] > 200 and dst[xj, xi] > nimolevel:
+                img[xj, xi] = [0, 0, 255]
+    return img

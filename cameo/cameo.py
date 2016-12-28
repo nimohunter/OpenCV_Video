@@ -19,7 +19,7 @@ class Cameo(object):
             frame = self._captureManager.frame
             
             if frame is not None:
-                self._captureManager.frame = filters.ToGray(frame)
+                self._captureManager.frame = filters.combineHighlightandCornerHarrisHanle(frame)
 
 
             self._captureManager.exitFrame()
