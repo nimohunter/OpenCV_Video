@@ -15,6 +15,7 @@ class CaptureManager(object):
         self._channel = 0
         self._enteredFrame = False
         self._frame = None
+        self._sreenshotCount = 0
         self._imageFilename = None
         self._videoFilename = None
         self._videoEncoding = None
@@ -23,7 +24,17 @@ class CaptureManager(object):
         self._startTime = None
         self._framesElapsed = long(0)
         self._fpsEstimate = None
-    
+
+    def getfpsEstimateStr(self):
+        return str(self._fpsEstimate)
+
+    def getSreenShotCount(self):
+        self._sreenshotCount += 1
+        result = ""
+        if self._sreenshotCount < 10:
+            result = "0"
+        return result + str(self._sreenshotCount)
+
     @property
     def channel(self):
         return self._channel
@@ -79,6 +90,7 @@ class CaptureManager(object):
             self._startTime = time.time()
         else:
             timeElapsed = time.time() - self._startTime
+            # print ("_framesElapsed =  %.2f , timeElapsed = %.2f\n" % (self._framesElapsed, timeElapsed))
             self._fpsEstimate =  self._framesElapsed / timeElapsed
         self._framesElapsed += 1
         

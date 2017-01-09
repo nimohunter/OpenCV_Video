@@ -259,16 +259,14 @@ def CannyDetect(src):
     return cv2.Canny(grayImg, 100, 200)
 
 def FastDetect(src):
-    fast = cv2.FastFeatureDetector()
-    grayImg = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
-    kp = fast.detect(grayImg, None)
-    return cv2.drawKeypoints(grayImg, kp, color=(255, 0, 0))
+    fast = cv2.FastFeatureDetector(20, True)
+
+    kp = fast.detect(src, None)
+    return cv2.drawKeypoints(src, kp, color=(255, 0, 0))
 
 def GaussianBlurhandle(src):
     grayImg = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
-    return cv2.GaussianBlur(grayImg, (9, 9), 0)
-
-
+    return cv2.GaussianBlur(grayImg, (5, 5), 0)
 
 def FaceDetect(src):
     face_cascade = cv2.CascadeClassifier('./cascades/haarcascade_frontalface_default.xml')
