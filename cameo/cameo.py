@@ -24,7 +24,8 @@ class Cameo(object):
             
             if frame is not None:
                 frame = cv2.undistort(frame, self._cameraMatrix, self._distCoeffs)
-                # frame = filters.GaussianBlurhandle(frame)
+                frame = filters.GaussianBlurhandle(frame)
+                frame = filters.goodFeaturesToTrackHandle(frame)
                 # frame = filters.FastDetect(frame)
                 # # self._captureManager.frame = filters.combineHighlightandCornerHarrisHanle(frame)
                 # cv2.putText(frame, self._captureManager.getfpsEstimateStr(), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, 2)

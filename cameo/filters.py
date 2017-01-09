@@ -276,7 +276,7 @@ def FaceDetect(src):
 
     faces = face_cascade.detectMultiScale(gray, 1.3, 5)
     for (x, y, w, h) in faces:
-        cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
     return img
 
 def CornerHarrisHanle(src):
@@ -315,3 +315,13 @@ def combineHighlightandCornerHarrisHanle(src):
             if gray[xj, xi] > 200 and dst[xj, xi] > nimolevel:
                 img[xj, xi] = [0, 0, 255]
     return img
+
+def goodFeaturesToTrackHandle(src):
+    img = src;
+    corners = cv2.goodFeaturesToTrack(img, 8, 0.2, 60)
+    corners = numpy.int0(corners)
+    for i in corners:
+        x, y = i.ravel()
+        cv2.circle(img, (x, y), 3, 255, -1)
+    return img
+
