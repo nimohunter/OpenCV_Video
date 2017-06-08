@@ -13,9 +13,8 @@ class CaptureManager(object):
         
         self._capture = capture
         self._channel = 0
-        self._enteredFrame = False
         self._frame = None
-        self._sreenshotCount = 0
+        self._sreenshotCount = 6
         self._imageFilename = None
         self._videoFilename = None
         self._videoEncoding = None
@@ -30,10 +29,7 @@ class CaptureManager(object):
 
     def getSreenShotCount(self):
         self._sreenshotCount += 1
-        result = ""
-        if self._sreenshotCount < 10:
-            result = "0"
-        return result + str(self._sreenshotCount)
+        return str(self._sreenshotCount)
 
     @property
     def channel(self):
@@ -47,11 +43,7 @@ class CaptureManager(object):
 
     @property
     def frame(self):
-        if self._enteredFrame and self._frame is None:
-            # As of OpenCV 3.0, VideoCapture.retrieve() no longer supports
-            # the channel argument.
-            # _, self._frame = self._capture.retrieve(channel = self.channel)
-            _, self._frame = self._capture.retrieve()
+        self._frame = self._capture.read()
         return self._frame
 
     @frame.setter
@@ -66,24 +58,8 @@ class CaptureManager(object):
     def isWritingVideo(self):
         return self._videoFilename is not None
     
-    def enterFrame(self):
-        """Capture the next frame, if any."""
-        
-        # But first, check that any previous frame was exited.
-        assert not self._enteredFrame, \
-            'previous enterFrame() had no matching exitFrame()'
-        
-        if self._capture is not None:
-            self._enteredFrame = self._capture.grab()
-    
     def exitFrame(self):
         """Draw to the window. Write to files. Release the frame."""
-        
-        # Check whether any grabbed frame is retrievable.
-        # The getter may retrieve and cache the frame.
-        if self.frame is None:
-            self._enteredFrame = False
-            return
         
         # Update the FPS estimate and related variables.
         if self._framesElapsed == 0:
@@ -92,6 +68,7 @@ class CaptureManager(object):
             timeElapsed = time.time() - self._startTime
             # print ("_framesElapsed =  %.2f , timeElapsed = %.2f\n" % (self._framesElapsed, timeElapsed))
             self._fpsEstimate =  self._framesElapsed / timeElapsed
+            print ("_framesElapsed =  %.2f , timeElapsed = %.2f, fps = %.2f \n" % (self._framesElapsed, timeElapsed, self._fpsEstimate))
         self._framesElapsed += 1
         
         # Draw to the window, if any.
@@ -113,7 +90,6 @@ class CaptureManager(object):
         
         # Release the frame.
         self._frame = None
-        self._enteredFrame = False
     
     def writeImage(self, filename):
         """Write the next exited frame to an image file."""
@@ -151,6 +127,7 @@ class CaptureManager(object):
                         cv2.cv.CV_CAP_PROP_FRAME_WIDTH)),
                     int(self._capture.get(
                         cv2.cv.CV_CAP_PROP_FRAME_HEIGHT)))
+            print ("size.x =  %d , size.y = %d  \n" % (size[0], size[1]))
             self._videoWriter = cv2.VideoWriter(
                 self._videoFilename, self._videoEncoding,
                 fps, size)
